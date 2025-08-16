@@ -1,0 +1,23 @@
+{
+  "name": "simple-shop",
+  "version": "1.0.0",
+  "description": "A simple e-commerce web app with basic features",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "ecommerce",
+    "express",
+    "shop"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.17.3",
+    "uuid": "^9.0.1",
+    "express-ejs-layouts": "^2.5.1"
+  }
+}

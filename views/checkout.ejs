@@ -1,0 +1,48 @@
+<div class="row" style="align-items:flex-start;gap:24px;">
+	<div style="flex:1;">
+		<h3>Thông tin khách hàng</h3>
+		<form action="/checkout" method="post" style="display:flex;flex-direction:column;gap:12px;max-width:480px;">
+			<label>
+				Họ và tên
+				<input type="text" name="name" value="<%= form.name %>">
+				<% if (errors.name) { %><div style="color:#fca5a5;font-size:13px;"><%= errors.name %></div><% } %>
+			</label>
+			<label>
+				Email
+				<input type="email" name="email" value="<%= form.email %>">
+				<% if (errors.email) { %><div style="color:#fca5a5;font-size:13px;"><%= errors.email %></div><% } %>
+			</label>
+			<label>
+				Địa chỉ nhận hàng
+				<textarea name="address" rows="4"><%= form.address %></textarea>
+				<% if (errors.address) { %><div style="color:#fca5a5;font-size:13px;"><%= errors.address %></div><% } %>
+			</label>
+			<button type="submit">Đặt hàng</button>
+		</form>
+	</div>
+	<div style="flex:1;">
+		<h3>Đơn hàng</h3>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Sản phẩm</th>
+					<th>SL</th>
+					<th>Tạm tính</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% cart.items.forEach(item => { %>
+					<tr>
+						<td><%= item.name %></td>
+						<td><%= item.quantity %></td>
+						<td><%= formatCurrency(item.subtotal) %></td>
+					</tr>
+				<% }) %>
+			</tbody>
+		</table>
+		<div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">
+			<div style="color:#94a3b8;">Tổng cộng:</div>
+			<div class="price" style="font-size:20px;"><%= formatCurrency(cart.total) %></div>
+		</div>
+	</div>
+</div>

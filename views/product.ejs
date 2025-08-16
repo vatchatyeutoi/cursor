@@ -1,0 +1,13 @@
+<div class="row" style="align-items:flex-start;gap:24px;">
+	<img src="<%= product.image %>" alt="<%= product.name %>" style="width:360px;max-width:100%;border-radius:16px;border:1px solid #243041;">
+	<div>
+		<h2 style="margin:0 0 8px 0;"> <%= product.name %> </h2>
+		<p class="price" style="font-size:20px;"> <%= formatCurrency(product.price) %> </p>
+		<p style="color:#94a3b8;max-width:560px;"> <%= product.description %> </p>
+		<form action="/cart/add" method="post" class="row" style="margin-top:12px;">
+			<input type="hidden" name="productId" value="<%= product.id %>">
+			<input type="number" name="quantity" value="1" min="1" style="width:120px;">
+			<button type="submit">Thêm vào giỏ</button>
+		</form>
+	</div>
+</div>

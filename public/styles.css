@@ -1,0 +1,142 @@
+:root {
+  --bg: #0f172a;
+  --card: #111827;
+  --muted: #94a3b8;
+  --text: #e5e7eb;
+  --accent: #22c55e;
+  --accent-2: #10b981;
+  --danger: #ef4444;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+  background: linear-gradient(180deg, #0A0F1F, #0B1120 60%, #0C1226);
+  color: var(--text);
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #1f2937;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 18px;
+  color: white;
+  text-decoration: none;
+}
+
+.nav-right a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.search {
+  display: flex;
+  gap: 8px;
+}
+
+input[type="text"], input[type="email"], input[type="number"], textarea {
+  background: #0b1220;
+  border: 1px solid #243041;
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+button, .btn {
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  color: #07210f;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn-secondary {
+  background: #1f2937;
+  color: var(--text);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: linear-gradient(180deg, #0B1220, #0C1426 60%, #0D162D);
+  border: 1px solid #243041;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.price {
+  color: #86efac;
+  font-weight: 700;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  border-bottom: 1px solid #1f2937;
+  padding: 10px;
+  text-align: left;
+}
+
+.footer {
+  margin-top: 48px;
+  padding: 24px;
+  color: var(--muted);
+  border-top: 1px solid #1f2937;
+}
+
+.alert {
+  background: #052e1a;
+  border: 1px solid #14532d;
+  color: #86efac;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin: 12px 0;
+}

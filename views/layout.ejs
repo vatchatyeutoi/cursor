@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title><%= typeof title !== 'undefined' ? title + ' · Simple Shop' : 'Simple Shop' %></title>
+	<link rel="stylesheet" href="/public/styles.css" />
+</head>
+<body>
+	<nav class="navbar">
+		<a href="/" class="brand">Simple Shop</a>
+		<form action="/" method="get" class="search">
+			<input type="text" name="q" value="<%= (query.q || '') %>" placeholder="Tìm sản phẩm..." />
+			<button type="submit">Tìm</button>
+		</form>
+		<div class="nav-right">
+			<a href="/cart">Giỏ hàng (<%= cartItemCount %>)</a>
+		</div>
+	</nav>
+	<div class="container">
+		<%- body %>
+	</div>
+	<div class="footer container">
+		<p>© <%= new Date().getFullYear() %> Simple Shop. Demo học tập.</p>
+	</div>
+</body>
+</html>

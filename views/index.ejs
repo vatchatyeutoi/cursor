@@ -1,0 +1,26 @@
+<% const hasSuccess = (query.success === '1'); %>
+<% const pageTitle = 'Sản phẩm'; %>
+
+<% if (hasSuccess) { %>
+	<div class="alert">Đặt hàng thành công! Cảm ơn bạn.</div>
+<% } %>
+
+<div class="grid">
+	<% products.forEach(p => { %>
+		<div class="card">
+			<img src="<%= p.image %>" alt="<%= p.name %>">
+			<div class="card-body">
+				<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+					<a href="/product/<%= p.id %>" style="color:white;text-decoration:none;font-weight:700;"><%= p.name %></a>
+					<span class="price"><%= formatCurrency(p.price) %></span>
+				</div>
+				<p style="color:#94a3b8;margin:0;min-height:40px;"> <%= p.description %> </p>
+				<form action="/cart/add" method="post" class="row">
+					<input type="hidden" name="productId" value="<%= p.id %>">
+					<input type="number" name="quantity" value="1" min="1" style="width:90px;">
+					<button type="submit">Thêm vào giỏ</button>
+				</form>
+			</div>
+		</div>
+	<% }) %>
+</div>
