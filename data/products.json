@@ -1,0 +1,44 @@
+[
+  {
+    "id": "p1",
+    "name": "Áo thun Unisex",
+    "price": 120000,
+    "image": "https://images.unsplash.com/photo-1520975898056-1f9af03f2473?w=800&q=80&auto=format&fit=crop",
+    "description": "Áo thun cotton 100% thoáng mát, phù hợp đi học đi chơi."
+  },
+  {
+    "id": "p2",
+    "name": "Quần jeans nam",
+    "price": 350000,
+    "image": "https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80&auto=format&fit=crop",
+    "description": "Quần jeans co giãn nhẹ, form slim-fit hiện đại."
+  },
+  {
+    "id": "p3",
+    "name": "Giày sneaker trắng",
+    "price": 650000,
+    "image": "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=800&q=80&auto=format&fit=crop",
+    "description": "Giày sneaker đơn giản, dễ phối đồ, đế êm."
+  },
+  {
+    "id": "p4",
+    "name": "Balo laptop 15 inch",
+    "price": 420000,
+    "image": "https://images.unsplash.com/photo-1598970434795-0c54fe7c0642?w=800&q=80&auto=format&fit=crop",
+    "description": "Balo chống sốc, nhiều ngăn tiện lợi, chống nước nhẹ."
+  },
+  {
+    "id": "p5",
+    "name": "Tai nghe Bluetooth",
+    "price": 290000,
+    "image": "https://images.unsplash.com/photo-1518444342320-7dfe0e3f92a2?w=800&q=80&auto=format&fit=crop",
+    "description": "Tai nghe không dây âm thanh rõ, pin 8 giờ."
+  },
+  {
+    "id": "p6",
+    "name": "Bình giữ nhiệt 500ml",
+    "price": 180000,
+    "image": "https://images.unsplash.com/photo-1610563166150-b34df4f3bcd6?w=800&q=80&auto=format&fit=crop",
+    "description": "Giữ nóng/lạnh lên tới 6-8 giờ, thiết kế gọn nhẹ."
+  }
+]

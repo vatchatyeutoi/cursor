@@ -1,0 +1,51 @@
+<% if (cart.items.length === 0) { %>
+	<p>Giỏ hàng trống. <a href="/" style="color:#86efac;">Tiếp tục mua sắm</a></p>
+<% } else { %>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Sản phẩm</th>
+				<th>Đơn giá</th>
+				<th>Số lượng</th>
+				<th>Tạm tính</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<% cart.items.forEach(item => { %>
+				<tr>
+					<td class="row">
+						<img src="<%= item.image %>" alt="<%= item.name %>" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid #243041;">
+						<div>
+							<div style="font-weight:700;"><%= item.name %></div>
+							<div style="color:#94a3b8;">Mã: <%= item.productId %></div>
+						</div>
+					</td>
+					<td><%= formatCurrency(item.price) %></td>
+					<td>
+						<form action="/cart/update" method="post" class="row">
+							<input type="hidden" name="productId" value="<%= item.productId %>">
+							<input type="number" name="quantity" value="<%= item.quantity %>" min="0" style="width:96px;">
+							<button type="submit" class="btn-secondary">Cập nhật</button>
+						</form>
+					</td>
+					<td><%= formatCurrency(item.subtotal) %></td>
+					<td>
+						<form action="/cart/remove" method="post">
+							<input type="hidden" name="productId" value="<%= item.productId %>">
+							<button type="submit" class="btn-danger">Xóa</button>
+						</form>
+					</td>
+				</tr>
+			<% }) %>
+		</tbody>
+	</table>
+	<div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">
+		<div style="color:#94a3b8;">Tổng cộng:</div>
+		<div class="price" style="font-size:20px;"><%= formatCurrency(cart.total) %></div>
+	</div>
+	<div style="margin-top:16px;display:flex;gap:12px;">
+		<a href="/" class="btn btn-secondary">Tiếp tục mua sắm</a>
+		<a href="/checkout" class="btn">Thanh toán</a>
+	</div>
+<% } %>
