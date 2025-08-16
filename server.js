@@ -77,21 +77,29 @@ function findProductById(products, id) {
 }
 
 function getCartDetailed(products, cart) {
-  const items = cart
-    .map((ci) => {
-      const product = findProductById(products, ci.productId);
-      if (!product) return null;
-      const subtotal = product.price * ci.quantity;
-      return {
-        productId: ci.productId,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        quantity: ci.quantity,
-        subtotal,
-      };
-    })
-    .filter(Boolean);
+  const items = [];
+  const validCart = [];
+
+  for (const ci of cart) {
+    const product = findProductById(products, ci.productId);
+    if (!product) continue;
+
+    const subtotal = product.price * ci.quantity;
+    items.push({
+      productId: ci.productId,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: ci.quantity,
+      subtotal,
+    });
+    validCart.push(ci);
+  }
+
+  // Remove invalid items from the original cart to keep the session consistent
+  cart.length = 0;
+  cart.push(...validCart);
+
   const total = items.reduce((sum, it) => sum + it.subtotal, 0);
   return { items, total };
 }
@@ -116,8 +124,7 @@ app.get('/product/:id', (req, res) => {
 
 app.get('/cart', (req, res) => {
   const products = readJson(PRODUCTS_FILE, []);
-  const cart = req.session.cart || [];
-  const detailed = getCartDetailed(products, cart);
+  const detailed = getCartDetailed(products, req.session.cart);
   res.render('cart', { cart: detailed, title: 'Giỏ hàng' });
 });
 
@@ -159,17 +166,22 @@ app.post('/cart/update', (req, res) => {
 
 app.post('/cart/remove', (req, res) => {
   const { productId } = req.body;
-  req.session.cart = (req.session.cart || []).filter((it) => it.productId !== productId);
+  req.session.cart = req.session.cart.filter((it) => it.productId !== productId);
   res.redirect('/cart');
 });
 
 app.get('/checkout', (req, res) => {
   const products = readJson(PRODUCTS_FILE, []);
-  const detailed = getCartDetailed(products, req.session.cart || []);
+  const detailed = getCartDetailed(products, req.session.cart);
   if (detailed.items.length === 0) {
     return res.redirect('/cart');
   }
-  res.render('checkout', { errors: {}, form: { name: '', email: '', address: '' }, cart: detailed, title: 'Thanh toán' });
+  res.render('checkout', {
+    errors: {},
+    form: { name: '', email: '', address: '' },
+    cart: detailed,
+    title: 'Thanh toán',
+  });
 });
 
 app.post('/checkout', (req, res) => {
@@ -180,7 +192,7 @@ app.post('/checkout', (req, res) => {
   if (!address || address.trim().length < 5) errors.address = 'Vui lòng nhập địa chỉ';
 
   const products = readJson(PRODUCTS_FILE, []);
-  const detailed = getCartDetailed(products, req.session.cart || []);
+  const detailed = getCartDetailed(products, req.session.cart);
 
   if (detailed.items.length === 0) {
     return res.redirect('/cart');
