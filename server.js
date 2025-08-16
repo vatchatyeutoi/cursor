@@ -4,6 +4,7 @@ const fs = require('fs');
 const session = require('express-session');
 const { v4: uuidv4 } = require('uuid');
 const expressLayouts = require('express-ejs-layouts');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
 const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
 
 function readJson(filePath, fallback) {
   try {
@@ -39,6 +41,9 @@ function ensureDataFiles() {
   if (!fs.existsSync(ORDERS_FILE)) {
     writeJson(ORDERS_FILE, []);
   }
+  if (!fs.existsSync(USERS_FILE)) {
+    writeJson(USERS_FILE, []);
+  }
 }
 
 ensureDataFiles();
@@ -61,7 +66,12 @@ app.use(
   })
 );
 
+function setFlash(req, type, message) {
+  req.session.flash = { type, message };
+}
+
 app.use((req, res, next) => {
+  // Make cart, helpers, query available
   if (!req.session.cart) {
     req.session.cart = [];
   }
@@ -69,6 +79,16 @@ app.use((req, res, next) => {
   res.locals.cartItemCount = cartItemCount;
   res.locals.formatCurrency = formatCurrency;
   res.locals.query = req.query || {};
+
+  // Flash messages
+  res.locals.flash = req.session.flash;
+  delete req.session.flash;
+
+  // Current user
+  const users = readJson(USERS_FILE, []);
+  const currentUser = users.find((u) => u.id === req.session.userId) || null;
+  res.locals.currentUser = currentUser;
+
   next();
 });
 
@@ -94,6 +114,15 @@ function getCartDetailed(products, cart) {
     .filter(Boolean);
   const total = items.reduce((sum, it) => sum + it.subtotal, 0);
   return { items, total };
+}
+
+function requireAuth(req, res, next) {
+  if (!req.session.userId) {
+    setFlash(req, 'error', 'Vui lòng đăng nhập để tiếp tục.');
+    const nextUrl = encodeURIComponent(req.originalUrl || '/');
+    return res.redirect(`/auth/login?next=${nextUrl}`);
+  }
+  next();
 }
 
 app.get('/', (req, res) => {
@@ -138,6 +167,7 @@ app.post('/cart/add', (req, res) => {
   } else {
     req.session.cart.push({ productId, quantity });
   }
+  setFlash(req, 'success', 'Đã thêm sản phẩm vào giỏ hàng.');
   res.redirect('/cart');
 });
 
@@ -154,16 +184,18 @@ app.post('/cart/update', (req, res) => {
       req.session.cart[idx].quantity = quantity;
     }
   }
+  setFlash(req, 'success', 'Cập nhật giỏ hàng thành công.');
   res.redirect('/cart');
 });
 
 app.post('/cart/remove', (req, res) => {
   const { productId } = req.body;
   req.session.cart = (req.session.cart || []).filter((it) => it.productId !== productId);
+  setFlash(req, 'success', 'Đã xóa sản phẩm khỏi giỏ hàng.');
   res.redirect('/cart');
 });
 
-app.get('/checkout', (req, res) => {
+app.get('/checkout', requireAuth, (req, res) => {
   const products = readJson(PRODUCTS_FILE, []);
   const detailed = getCartDetailed(products, req.session.cart || []);
   if (detailed.items.length === 0) {
@@ -172,7 +204,7 @@ app.get('/checkout', (req, res) => {
   res.render('checkout', { errors: {}, form: { name: '', email: '', address: '' }, cart: detailed, title: 'Thanh toán' });
 });
 
-app.post('/checkout', (req, res) => {
+app.post('/checkout', requireAuth, (req, res) => {
   const { name, email, address } = req.body;
   const errors = {};
   if (!name || name.trim().length < 2) errors.name = 'Vui lòng nhập tên';
@@ -194,6 +226,7 @@ app.post('/checkout', (req, res) => {
   const order = {
     id: uuidv4(),
     createdAt: new Date().toISOString(),
+    userId: req.session.userId || null,
     customer: { name, email, address },
     items: detailed.items,
     total: detailed.total,
@@ -202,7 +235,87 @@ app.post('/checkout', (req, res) => {
   writeJson(ORDERS_FILE, orders);
 
   req.session.cart = [];
-  res.redirect('/?success=1');
+  setFlash(req, 'success', 'Đặt hàng thành công! Cảm ơn bạn.');
+  res.redirect('/');
+});
+
+// Authentication routes
+app.get('/auth/register', (req, res) => {
+  res.render('auth/register', { title: 'Đăng ký', errors: {}, form: { name: '', email: '', password: '', confirmPassword: '' } });
+});
+
+app.post('/auth/register', async (req, res) => {
+  const { name, email, password, confirmPassword } = req.body;
+  const form = { name: name || '', email: email || '', password: '', confirmPassword: '' };
+  const errors = {};
+
+  if (!name || name.trim().length < 2) errors.name = 'Tên tối thiểu 2 ký tự';
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Email không hợp lệ';
+  if (!password || password.length < 6) errors.password = 'Mật khẩu tối thiểu 6 ký tự';
+  if (password !== confirmPassword) errors.confirmPassword = 'Mật khẩu nhập lại không khớp';
+
+  const users = readJson(USERS_FILE, []);
+  const existing = users.find((u) => u.email.toLowerCase() === (email || '').toLowerCase());
+  if (existing) {
+    errors.email = 'Email đã được sử dụng';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return res.status(400).render('auth/register', { title: 'Đăng ký', errors, form });
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  const user = {
+    id: uuidv4(),
+    name: name.trim(),
+    email: email.trim().toLowerCase(),
+    passwordHash,
+    createdAt: new Date().toISOString(),
+  };
+  users.push(user);
+  writeJson(USERS_FILE, users);
+
+  req.session.userId = user.id;
+  setFlash(req, 'success', 'Đăng ký thành công!');
+  res.redirect('/');
+});
+
+app.get('/auth/login', (req, res) => {
+  const nextUrl = (req.query.next || '/').toString();
+  res.render('auth/login', { title: 'Đăng nhập', errors: {}, form: { email: '', password: '', next: nextUrl } });
+});
+
+app.post('/auth/login', async (req, res) => {
+  const { email, password, next } = req.body;
+  const users = readJson(USERS_FILE, []);
+  const user = users.find((u) => u.email.toLowerCase() === (email || '').toLowerCase());
+
+  if (!user) {
+    return res.status(400).render('auth/login', { title: 'Đăng nhập', errors: { email: 'Email hoặc mật khẩu không đúng' }, form: { email, password: '', next: next || '/' } });
+  }
+
+  const ok = await bcrypt.compare(password || '', user.passwordHash);
+  if (!ok) {
+    return res.status(400).render('auth/login', { title: 'Đăng nhập', errors: { email: 'Email hoặc mật khẩu không đúng' }, form: { email, password: '', next: next || '/' } });
+  }
+
+  req.session.userId = user.id;
+  setFlash(req, 'success', 'Đăng nhập thành công!');
+  const redirectTo = next && typeof next === 'string' ? next : '/';
+  res.redirect(redirectTo);
+});
+
+app.post('/auth/logout', (req, res) => {
+  req.session.userId = null;
+  setFlash(req, 'success', 'Đã đăng xuất.');
+  res.redirect('/');
+});
+
+// Orders page for current user
+app.get('/orders', requireAuth, (req, res) => {
+  const orders = readJson(ORDERS_FILE, []);
+  const myOrders = orders.filter((o) => o.userId === req.session.userId);
+  res.render('orders', { title: 'Đơn hàng của tôi', orders: myOrders });
 });
 
 app.listen(PORT, () => {

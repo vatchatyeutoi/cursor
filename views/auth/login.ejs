@@ -1,0 +1,17 @@
+<div style="max-width:480px;margin:0 auto;">
+	<h2 style="margin-top:0;">Đăng nhập</h2>
+	<form action="/auth/login" method="post" style="display:flex;flex-direction:column;gap:12px;">
+		<input type="hidden" name="next" value="<%= form.next %>">
+		<label>
+			Email
+			<input type="email" name="email" value="<%= form.email %>">
+			<% if (errors.email) { %><div style="color:#fca5a5;font-size:13px;"><%= errors.email %></div><% } %>
+		</label>
+		<label>
+			Mật khẩu
+			<input type="password" name="password" value="">
+		</label>
+		<button type="submit">Đăng nhập</button>
+	</form>
+	<p style="color:#94a3b8;margin-top:12px;">Chưa có tài khoản? <a href="/auth/register" style="color:#86efac;">Đăng ký</a></p>
+</div>

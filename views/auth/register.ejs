@@ -1,0 +1,27 @@
+<div style="max-width:520px;margin:0 auto;">
+	<h2 style="margin-top:0;">Tạo tài khoản</h2>
+	<form action="/auth/register" method="post" style="display:flex;flex-direction:column;gap:12px;">
+		<label>
+			Họ và tên
+			<input type="text" name="name" value="<%= form.name %>">
+			<% if (errors.name) { %><div style="color:#fca5a5;font-size:13px;"><%= errors.name %></div><% } %>
+		</label>
+		<label>
+			Email
+			<input type="email" name="email" value="<%= form.email %>">
+			<% if (errors.email) { %><div style="color:#fca5a5;font-size:13px;"><%= errors.email %></div><% } %>
+		</label>
+		<label>
+			Mật khẩu
+			<input type="password" name="password" value="">
+			<% if (errors.password) { %><div style="color:#fca5a5;font-size:13px;"><%= errors.password %></div><% } %>
+		</label>
+		<label>
+			Nhập lại mật khẩu
+			<input type="password" name="confirmPassword" value="">
+			<% if (errors.confirmPassword) { %><div style="color:#fca5a5;font-size:13px;"><%= errors.confirmPassword %></div><% } %>
+		</label>
+		<button type="submit">Đăng ký</button>
+	</form>
+	<p style="color:#94a3b8;margin-top:12px;">Đã có tài khoản? <a href="/auth/login" style="color:#86efac;">Đăng nhập</a></p>
+</div>

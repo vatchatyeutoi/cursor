@@ -13,11 +13,23 @@
 			<input type="text" name="q" value="<%= (query.q || '') %>" placeholder="Tìm sản phẩm..." />
 			<button type="submit">Tìm</button>
 		</form>
-		<div class="nav-right">
+		<div class="nav-right row">
 			<a href="/cart">Giỏ hàng (<%= cartItemCount %>)</a>
+			<% if (currentUser) { %>
+				<a href="/orders" style="margin-left:8px;">Đơn hàng</a>
+				<form action="/auth/logout" method="post" style="margin:0;margin-left:8px;">
+					<button type="submit" class="btn-secondary">Đăng xuất</button>
+				</form>
+			<% } else { %>
+				<a href="/auth/login" style="margin-left:8px;">Đăng nhập</a>
+				<a href="/auth/register" style="margin-left:8px;">Đăng ký</a>
+			<% } %>
 		</div>
 	</nav>
 	<div class="container">
+		<% if (flash) { %>
+			<div class="alert" style="margin-top:12px;"><%= flash.message %></div>
+		<% } %>
 		<%- body %>
 	</div>
 	<div class="footer container">

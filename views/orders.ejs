@@ -1,0 +1,40 @@
+<div>
+	<h2>Đơn hàng của tôi</h2>
+	<% if (!orders || orders.length === 0) { %>
+		<p>Chưa có đơn hàng nào.</p>
+	<% } else { %>
+		<div style="display:flex;flex-direction:column;gap:16px;">
+			<% orders.forEach(o => { %>
+				<div class="card">
+					<div class="card-body">
+						<div style="display:flex;justify-content:space-between;align-items:center;">
+							<div>
+								<div style="font-weight:700;">Mã đơn: <%= o.id %></div>
+								<div style="color:#94a3b8;">Ngày: <%= new Date(o.createdAt).toLocaleString('vi-VN') %></div>
+							</div>
+							<div class="price"><%= formatCurrency(o.total) %></div>
+						</div>
+						<table class="table" style="margin-top:8px;">
+							<thead>
+								<tr>
+									<th>Sản phẩm</th>
+									<th>SL</th>
+									<th>Tạm tính</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% o.items.forEach(it => { %>
+									<tr>
+										<td><%= it.name %></td>
+										<td><%= it.quantity %></td>
+										<td><%= formatCurrency(it.subtotal) %></td>
+									</tr>
+								<% }) %>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			<% }) %>
+		</div>
+	<% } %>
+</div>
